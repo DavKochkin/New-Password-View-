@@ -7,11 +7,13 @@
 
 import UIKit
 
-class OnboardingViewController: UIViewController {
+class ViewController: UIViewController {
     
     let newPasswordTextField = PasswordTextField(placeHolder: "New password")
     let stackView = UIStackView()
-    let criteriaView = PasswordCriteriaView(text: "uppercase letter (A-Z)")
+    let statusView = PasswordStatusView()
+    let confirmPasswordTextField = PasswordTextField(placeHolder: "Re-enter new password")
+    let resetButton = UIButton(type: .system)
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -21,7 +23,7 @@ class OnboardingViewController: UIViewController {
 }
 
 
-extension OnboardingViewController {
+extension ViewController {
     func style() {
         
         stackView.translatesAutoresizingMaskIntoConstraints = false
@@ -29,20 +31,31 @@ extension OnboardingViewController {
         stackView.spacing = 20
 
         newPasswordTextField.translatesAutoresizingMaskIntoConstraints = false
-        criteriaView.translatesAutoresizingMaskIntoConstraints = false
-       
+        
+        statusView.translatesAutoresizingMaskIntoConstraints = false
+        statusView.layer.cornerRadius = 5
+        statusView.clipsToBounds = true
+        
+        confirmPasswordTextField.translatesAutoresizingMaskIntoConstraints = false
+        
+        resetButton.translatesAutoresizingMaskIntoConstraints = false
+        resetButton.configuration = .filled()
+        resetButton.setTitle("Reset password", for: [])
+        // resetButton.addTarget(self, action: #selector(resetPasswordButtonTapped), for: .primaryActionTriggered)
     }
     
     func layout() {
-        //stackView.addArrangedSubview(newPasswordTextField)
-        stackView.addArrangedSubview(criteriaView)
+        stackView.addArrangedSubview(newPasswordTextField)
+        stackView.addArrangedSubview(statusView)
+        stackView.addArrangedSubview(confirmPasswordTextField)
+        stackView.addArrangedSubview(resetButton)
         
         view.addSubview(stackView)
         
         NSLayoutConstraint.activate([
-            stackView.centerYAnchor.constraint(equalTo: view.centerYAnchor),
             stackView.leadingAnchor.constraint(equalToSystemSpacingAfter: view.leadingAnchor, multiplier: 2),
             view.trailingAnchor.constraint(equalToSystemSpacingAfter: stackView.trailingAnchor, multiplier: 2),
+            stackView.centerYAnchor.constraint(equalTo: view.centerYAnchor),
         ])
     }
 }
