@@ -4,22 +4,22 @@
 //
 //  Created by David Kochkin on 12.06.2023.
 //
+import Foundation
 import UIKit
 
 class PasswordStatusView: UIView {
-    
     let stackView = UIStackView()
     
     let criteriaLabel = UILabel()
     
-    let lenghtCriteriaView = PasswordCriteriaView(text: "8-32 characters (no spaces")
+    let lengthCriteriaView = PasswordCriteriaView(text: "8-32 characters (no spaces)")
     let uppercaseCriteriaView = PasswordCriteriaView(text: "uppercase letter (A-Z)")
-    let lowercaseCriteriaView = PasswordCriteriaView(text: "lowercase (a-z)")
+    let lowerCaseCriteriaView = PasswordCriteriaView(text: "lowercase (a-z)")
     let digitCriteriaView = PasswordCriteriaView(text: "digit (0-9)")
-    let specialCharacterCriteriaView = PasswordCriteriaView(text: "special character (e.g. !@#$%ˆ)")
+    let specialCharacterCriteriaView = PasswordCriteriaView(text: "special character (e.g. !@#$%^)")
     
-    // Used to determine if we reset criteria back to empty state (0)
-    private var shouldResetCriteria: Bool = true
+    // Used to determine if we reset criteria back to empty state (⚪️).
+    var shouldResetCriteria: Bool = true
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -33,10 +33,9 @@ class PasswordStatusView: UIView {
     }
     
     override var intrinsicContentSize: CGSize {
-            return CGSize(width: 200, height: 200)
-        }
+        return CGSize(width: 200, height: 200)
+    }
 }
-
 
 extension PasswordStatusView {
     
@@ -44,37 +43,33 @@ extension PasswordStatusView {
         translatesAutoresizingMaskIntoConstraints = false
         backgroundColor = .tertiarySystemFill
         
-        
         stackView.translatesAutoresizingMaskIntoConstraints = false
         stackView.axis = .vertical
         stackView.spacing = 8
         stackView.distribution = .equalCentering
         
-        criteriaLabel.translatesAutoresizingMaskIntoConstraints = false
+        criteriaLabel.numberOfLines = 0
         criteriaLabel.lineBreakMode = .byWordWrapping
         criteriaLabel.attributedText = makeCriteriaMessage()
-        criteriaLabel.numberOfLines = 0
         
-        lenghtCriteriaView.translatesAutoresizingMaskIntoConstraints = false
+        lengthCriteriaView.translatesAutoresizingMaskIntoConstraints = false
         uppercaseCriteriaView.translatesAutoresizingMaskIntoConstraints = false
-        lowercaseCriteriaView.translatesAutoresizingMaskIntoConstraints = false
+        lowerCaseCriteriaView.translatesAutoresizingMaskIntoConstraints = false
         digitCriteriaView.translatesAutoresizingMaskIntoConstraints = false
         specialCharacterCriteriaView.translatesAutoresizingMaskIntoConstraints = false
-        
     }
     
     func layout() {
-        stackView.addArrangedSubview(lenghtCriteriaView)
+        stackView.addArrangedSubview(lengthCriteriaView)
         stackView.addArrangedSubview(criteriaLabel)
         stackView.addArrangedSubview(uppercaseCriteriaView)
-        stackView.addArrangedSubview(lowercaseCriteriaView)
+        stackView.addArrangedSubview(lowerCaseCriteriaView)
         stackView.addArrangedSubview(digitCriteriaView)
         stackView.addArrangedSubview(specialCharacterCriteriaView)
         
         addSubview(stackView)
-        
-        
-        // StackView
+
+        // Stack layout
         NSLayoutConstraint.activate([
             stackView.topAnchor.constraint(equalToSystemSpacingBelow: topAnchor, multiplier: 2),
             stackView.leadingAnchor.constraint(equalToSystemSpacingAfter: leadingAnchor, multiplier: 2),
@@ -100,36 +95,68 @@ extension PasswordStatusView {
     }
 }
 
-//MARK: Actions
+// MARK: Actions
 extension PasswordStatusView {
     func updateDisplay(_ text: String) {
-        let lenghtAndNoSpaceMet = PasswordCriteria.lenghtAndNoSpaceMet(text)
-        let uppercaseMet = PasswordCriteria.upperaseMet(text)
-        let lowercaseMet = PasswordCriteria.lowerCase(text)
+        let lengthAndNoSpaceMet = PasswordCriteria.lengthAndNoSpaceMet(text)
+        let uppercaseMet = PasswordCriteria.uppercaseMet(text)
+        let lowercaseMet = PasswordCriteria.lowercaseMet(text)
         let digitMet = PasswordCriteria.digitMet(text)
-        let characterMet = PasswordCriteria.specialCharacterMet(text)
+        let specialCharacterMet = PasswordCriteria.specialCharacterMet(text)
         
-        if shouldResetCriteria{
-            // inline validation
-            lenghtAndNoSpaceMet
-            ? lenghtCriteriaView.isCriteriaMet = true
-            : lenghtCriteriaView.reset()
+        if shouldResetCriteria {
+            // Inline validation (✅ or ⚪️)
+            lengthAndNoSpaceMet
+                ? lengthCriteriaView.isCriteriaMet = true
+                : lengthCriteriaView.reset()
             
             uppercaseMet
-            ? uppercaseCriteriaView.isCriteriaMet = true
-            : uppercaseCriteriaView.reset()
+                ? uppercaseCriteriaView.isCriteriaMet = true
+                : uppercaseCriteriaView.reset()
             
             lowercaseMet
-            ? lowercaseCriteriaView.isCriteriaMet = true
-            : lowercaseCriteriaView.reset()
-            
+                ? lowerCaseCriteriaView.isCriteriaMet = true
+                : lowerCaseCriteriaView.reset()
+
             digitMet
-            ? digitCriteriaView.isCriteriaMet = true
-            : digitCriteriaView.reset()
+                ? digitCriteriaView.isCriteriaMet = true
+                : digitCriteriaView.reset()
             
-            characterMet
-            ? specialCharacterCriteriaView.isCriteriaMet = true
-            : specialCharacterCriteriaView.reset() 
+            specialCharacterMet
+                ? specialCharacterCriteriaView.isCriteriaMet = true
+                : specialCharacterCriteriaView.reset()
+        } else {
+            //Focus lost
+            lengthCriteriaView.isCriteriaMet = lengthAndNoSpaceMet
+            uppercaseCriteriaView.isCriteriaMet = uppercaseMet
+            lowerCaseCriteriaView.isCriteriaMet = lowercaseMet
+            digitCriteriaView.isCriteriaMet = digitMet
+            specialCharacterCriteriaView.isCriteriaMet = specialCharacterMet
         }
+    }
+    
+    func validate(_ text: String) -> Bool {
+        let uppercaseMet = PasswordCriteria.uppercaseMet(text)
+        let lowercaseMet = PasswordCriteria.lowercaseMet(text)
+        let digitMet = PasswordCriteria.digitMet(text)
+        let specialCharacterMet = PasswordCriteria.specialCharacterMet(text)
+        
+        let checkable = [uppercaseMet, lowercaseMet, digitMet, specialCharacterMet]
+        let metCriteria = checkable.filter { $0 == true}
+        let lengthAndNoSpaceMet = PasswordCriteria.lengthAndNoSpaceMet(text)
+        
+        if lengthAndNoSpaceMet && metCriteria.count >= 3 {
+            return true
+        }
+        
+        return false
+    }
+    
+    func reset() {
+        lengthCriteriaView.reset()
+        uppercaseCriteriaView.reset()
+        lowerCaseCriteriaView.reset()
+        digitCriteriaView.reset()
+        specialCharacterCriteriaView.reset()
     }
 }
